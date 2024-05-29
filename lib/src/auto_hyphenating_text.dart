@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:hyphenator_impure/hyphenator.dart';
+import 'package:hyphenator/hyphenator.dart';
 
 /// This object is used to tell us acceptable hyphenation positions
 /// It is the default loader used unless a custom one is provided
@@ -14,25 +14,25 @@ Future<void> initHyphenation([DefaultResourceLoaderLanguage language = DefaultRe
 /// A replacement for the default text object which supports hyphenation.
 class AutoHyphenatingText extends StatelessWidget {
   const AutoHyphenatingText(
-      this.text, {
-        this.shouldHyphenate,
-        this.loader,
-        this.style,
-        this.strutStyle,
-        this.textAlign,
-        this.textDirection,
-        this.locale,
-        this.softWrap,
-        this.overflow,
-        this.scaler,
-        this.maxLines,
-        this.semanticsLabel,
-        this.textWidthBasis,
-        this.selectionColor,
-        this.hyphenationCharacter = '‐',
-        this.selectable = false,
-        super.key,
-      });
+    this.text, {
+    this.shouldHyphenate,
+    this.loader,
+    this.style,
+    this.strutStyle,
+    this.textAlign,
+    this.textDirection,
+    this.locale,
+    this.softWrap,
+    this.overflow,
+    this.scaler,
+    this.maxLines,
+    this.semanticsLabel,
+    this.textWidthBasis,
+    this.selectionColor,
+    this.hyphenationCharacter = '‐',
+    this.selectable = false,
+    super.key,
+  });
 
   final String text;
 
@@ -91,10 +91,8 @@ class AutoHyphenatingText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double getTextWidth(String text, TextStyle? style, TextDirection? direction, TextScaler? scaler) {
-
-      final TextStyle? localStyle = MediaQuery.boldTextOf(context)
-        ? (style == null ? const TextStyle(fontWeight: FontWeight.bold) : style.copyWith(fontWeight: FontWeight.bold))
-        : null;
+      final TextStyle? localStyle =
+          MediaQuery.boldTextOf(context) ? (style == null ? const TextStyle(fontWeight: FontWeight.bold) : style.copyWith(fontWeight: FontWeight.bold)) : null;
 
       final TextPainter textPainter = TextPainter(
         text: TextSpan(text: text, style: localStyle ?? style),
@@ -170,12 +168,8 @@ class AutoHyphenatingText extends StatelessWidget {
           texts.add(TextSpan(text: words[i]));
           currentLineSpaceUsed += wordWidth;
         } else {
-          final List<String> syllables = words[i].length == 1
-              ? <String>[words[i]]
-              : hyphenateWordToListWrapper(words[i]);
-          final int? syllableToUse = words[i].length == 1
-              ? null
-              : getLastSyllableIndex(syllables, constraints.maxWidth - currentLineSpaceUsed, effectiveTextStyle, lines);
+          final List<String> syllables = words[i].length == 1 ? <String>[words[i]] : hyphenateWordToListWrapper(words[i]);
+          final int? syllableToUse = words[i].length == 1 ? null : getLastSyllableIndex(syllables, constraints.maxWidth - currentLineSpaceUsed, effectiveTextStyle, lines);
 
           if (syllableToUse == null || (shouldHyphenate != null && !shouldHyphenate!(constraints.maxWidth, currentLineSpaceUsed, wordWidth))) {
             if (currentLineSpaceUsed == 0) {
