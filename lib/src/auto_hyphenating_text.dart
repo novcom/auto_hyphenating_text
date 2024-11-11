@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:hyphenator_impure/hyphenator.dart';
+import 'package:hyphenator/hyphenator.dart';
 
 Hyphenator? hyphenator;
 
 /// Inits the default global hyphenation loader. If this is omitted a custom hyphenator must be provided.
 Future<void> initHyphenation([DefaultResourceLoaderLanguage language = DefaultResourceLoaderLanguage.enUs]) async {
-	hyphenator = Hyphenator(
-		resource: await DefaultResourceLoader.load(language),
-		hyphenateSymbol: '_',
-	);
+  hyphenator = Hyphenator(
+    resource: await DefaultResourceLoader.load(language),
+    hyphenateSymbol: '_',
+  );
 }
 
 /// A replacement for the default text object which supports hyphenation.
 class AutoHyphenatingText extends StatelessWidget {
   const AutoHyphenatingText(
-      this.text, {
-        this.shouldHyphenate,
-        this.customHyphenator,
-        this.style,
-        this.strutStyle,
-        this.textAlign,
-        this.textDirection,
-        this.locale,
-        this.softWrap,
-        this.overflow,
-        this.scaler,
-        this.maxLines,
-        this.semanticsLabel,
-        this.textWidthBasis,
-        this.selectionColor,
-        this.hyphenationCharacter = '‐',
-        this.selectable = false,
-        super.key,
-      });
+    this.text, {
+    this.shouldHyphenate,
+    this.customHyphenator,
+    this.style,
+    this.strutStyle,
+    this.textAlign,
+    this.textDirection,
+    this.locale,
+    this.softWrap,
+    this.overflow,
+    this.scaler,
+    this.maxLines,
+    this.semanticsLabel,
+    this.textWidthBasis,
+    this.selectionColor,
+    this.hyphenationCharacter = '‐',
+    this.selectable = false,
+    super.key,
+  });
 
   final String text;
 
@@ -92,10 +92,8 @@ class AutoHyphenatingText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double getTextWidth(String text, TextStyle? style, TextDirection? direction, TextScaler? scaler) {
-
-      final TextStyle? localStyle = MediaQuery.boldTextOf(context)
-        ? (style == null ? const TextStyle(fontWeight: FontWeight.bold) : style.copyWith(fontWeight: FontWeight.bold))
-        : null;
+      final TextStyle? localStyle =
+          MediaQuery.boldTextOf(context) ? (style == null ? const TextStyle(fontWeight: FontWeight.bold) : style.copyWith(fontWeight: FontWeight.bold)) : null;
 
       final TextPainter textPainter = TextPainter(
         text: TextSpan(text: text, style: localStyle ?? style),
@@ -138,23 +136,24 @@ class AutoHyphenatingText extends StatelessWidget {
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       List<String> words = [];
-        List<String> linesSplitByNewline = text.split('\n');
-        List<int> newlineIdx = [];
+      List<String> linesSplitByNewline = text.split('\n');
+      List<int> newlineIdx = [];
 
-        for (final line in linesSplitByNewline) {
-          List<String> wordsInLine = line.split(' ');
-          if (wordsInLine.isNotEmpty) {
-            newlineIdx.add(words.length + wordsInLine.length - 1);
-          }
-          words.addAll(wordsInLine);
+      for (final line in linesSplitByNewline) {
+        List<String> wordsInLine = line.split(' ');
+        if (wordsInLine.isNotEmpty) {
+          newlineIdx.add(words.length + wordsInLine.length - 1);
         }
+        words.addAll(wordsInLine);
+      }
 
-        if (newlineIdx.isNotEmpty) {
-          newlineIdx.removeLast();
-        }
+      if (newlineIdx.isNotEmpty) {
+        newlineIdx.removeLast();
+      }
       List<InlineSpan> texts = <InlineSpan>[];
 
-      assert(hyphenator != null || customHyphenator != null, "AutoHyphenatingText not initialized! Remember to call initHyphenation() or provide a custom hyphenator. This may require a full app restart.");
+      assert(hyphenator != null || customHyphenator != null,
+          "AutoHyphenatingText not initialized! Remember to call initHyphenation() or provide a custom hyphenator. This may require a full app restart.");
 
       double singleSpaceWidth = getTextWidth(" ", effectiveTextStyle, textDirection, scaler);
       double currentLineSpaceUsed = 0;
@@ -191,12 +190,8 @@ class AutoHyphenatingText extends StatelessWidget {
           currentLineSpaceUsed += wordWidth;
           insertforcedNewLine();
         } else {
-          final List<String> syllables = words[i].length == 1
-              ? <String>[words[i]]
-              : hyphenateWordToListWrapper(words[i]);
-          final int? syllableToUse = words[i].length == 1
-              ? null
-              : getLastSyllableIndex(syllables, constraints.maxWidth - currentLineSpaceUsed, effectiveTextStyle, lines);
+          final List<String> syllables = words[i].length == 1 ? <String>[words[i]] : hyphenateWordToListWrapper(words[i]);
+          final int? syllableToUse = words[i].length == 1 ? null : getLastSyllableIndex(syllables, constraints.maxWidth - currentLineSpaceUsed, effectiveTextStyle, lines);
 
           if (syllableToUse == null || (shouldHyphenate != null && !shouldHyphenate!(constraints.maxWidth, currentLineSpaceUsed, wordWidth))) {
             if (currentLineSpaceUsed == 0) {
